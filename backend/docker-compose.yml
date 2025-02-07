@@ -1,0 +1,31 @@
+# Postavljamo backend i bazu u Docker kontejnere, Lokalna verzija DynamoDB-a (bez autentifikacije)
+# FastAPI backend koristi lokalni endpoint baze (http://dynamodb:8000)
+
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dynamodb
+    environment:
+      - AWS_ACCESS_KEY_ID=fakeKey
+      - AWS_SECRET_ACCESS_KEY=fakeSecret
+      - AWS_REGION=us-east-1
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+    volumes:
+      - .:/app
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    container_name: dynamodb
+    ports:
+      - "8000:8000"
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
+    volumes:
+      - dynamodb_data:/home/dynamodblocal
+
+volumes:
+  dynamodb_data:
