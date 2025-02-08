@@ -1,14 +1,26 @@
 #glavni ulaz u aplikaciju
 
 from fastapi import FastAPI
-from routes import exhibits, users, auth  # Dodali smo auth
+from routes import exhibitions, users, comments
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(title="Art Gallery Backend")
 
-app.include_router(exhibits.router, prefix="/exhibits", tags=["Exhibits"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])  # NOVO
+# ruta za usere
+app.include_router(users.router, prefix="/users")
+app.include_router(exhibitions.router, prefix="/exhibits")
+app.include_router(comments.router, prefix="/comments")
+
 
 @app.get("/")
-def read_root():
-    return {"message": "Dobrodošli u Art Gallery Backend!"}
+def home():
+    return {"message": "Dobrodošli u Art Gallery!"}
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Dozvoli sve metode (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Dozvoli sve zaglavlja
+)
